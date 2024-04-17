@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Tuple
 import cv2
 
 from tqdm import tqdm
@@ -42,7 +43,7 @@ _CFG = {
 
 def run_tils_pipeline(
     wsi_mri: mir.MultiResolutionImage,
-) -> None:
+) -> Tuple[int, np.ndarray]:
     loop_timer = timer.Timer(_CFG['TIME_LIMIT'], auto_start=True)
 
     seg_pipeline = _build_models()
@@ -59,7 +60,7 @@ def run_tils_pipeline(
     if not has_valid_tils_region:
         print("has no valid tils region")
 
-        return _CFG['TILS_SCORE']['MIN']
+        return _CFG['TILS_SCORE']['MIN'], seg_mask
     else:
         # get tumor boundary points
         candid_center_pts = patch_select.get_n_boundary_pts(
@@ -147,7 +148,7 @@ def run_tils_pipeline(
         print(f"{pseudo_tils_score}")
         print(f"{final_tils_score}")
 
-    return final_tils_score
+    return final_tils_score, seg_mask
 
 
 def _build_models(
