@@ -235,6 +235,7 @@ class TIGERSegmentationPipeline(TIGERSegmentationPipelineBase):
             kernel_canvas[y:y + self.wsize, x:x + self.wsize, ...] += kernel
 
         # Predict
+        torch.manual_seed(0)  # Solves a reproducibility issue with the segmentation prediction by fixing the torch random seed
         use_cuda = torch.cuda.is_available()
         with torch.no_grad():
             for batch in tqdm(input_dl, desc="Segmentation"):
